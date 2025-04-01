@@ -5,20 +5,16 @@ import platformdirs
 from .version import TTAAT_DB_VERSION
 
 
-def get_db_path():
-    """Get the path to the SQLite database file with cross-platform support."""
-    # Use platformdirs to get the right location on any platform
+def ensure_db_path():
+    """Ensure the database directory exists and return the database file path."""
     app_dir = platformdirs.user_data_dir("ttaat")
-    
-    # Create directory if it doesn't exist
     os.makedirs(app_dir, exist_ok=True)
-    
     return os.path.join(app_dir, "ttaat.db")
 
 
 def get_connection():
     """Get a connection to the SQLite database in WAL mode."""
-    db_path = get_db_path()
+    db_path = ensure_db_path()
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
