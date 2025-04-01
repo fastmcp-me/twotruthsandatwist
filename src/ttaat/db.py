@@ -1,19 +1,19 @@
 import os
 import sqlite3
 from pathlib import Path
+import platformdirs
 from .version import TTAAT_DB_VERSION
 
 
 def get_db_path():
-    """Get the path to the SQLite database file."""
-    data_home = os.environ.get("XDG_DATA_HOME", None)
-    if data_home is None:
-        data_home = os.path.expanduser("~/.local/share")
+    """Get the path to the SQLite database file with cross-platform support."""
+    # Use platformdirs to get the right location on any platform
+    app_dir = platformdirs.user_data_dir("ttaat")
     
-    ttaat_dir = os.path.join(data_home, "ttaat")
-    os.makedirs(ttaat_dir, exist_ok=True)
+    # Create directory if it doesn't exist
+    os.makedirs(app_dir, exist_ok=True)
     
-    return os.path.join(ttaat_dir, "ttaat.db")
+    return os.path.join(app_dir, "ttaat.db")
 
 
 def get_connection():
