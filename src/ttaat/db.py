@@ -12,8 +12,8 @@ def ensure_db_path():
     return os.path.join(app_dir, "ttaat.db")
 
 
-def get_connection():
-    """Get a connection to the SQLite database in WAL mode."""
+def dbconnect():
+    """Open a connection to the SQLite database in WAL mode."""
     db_path = ensure_db_path()
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
@@ -24,7 +24,7 @@ def get_connection():
 
 def initialize_db():
     """Initialize the database with the schema if it doesn't exist yet."""
-    conn = get_connection()
+    conn = dbconnect()
     cursor = conn.cursor()
     
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='ttaat_db_version'")
@@ -97,7 +97,7 @@ def migrate_db(conn, current_version):
 
 def get_score():
     """Get the current score (player vs. game master)."""
-    conn = get_connection()
+    conn = dbconnect()
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -120,7 +120,7 @@ def get_score():
 
 def get_total_rounds():
     """Get the total number of completed rounds."""
-    conn = get_connection()
+    conn = dbconnect()
     cursor = conn.cursor()
     
     cursor.execute("SELECT COUNT(*) FROM rounds")
@@ -132,7 +132,7 @@ def get_total_rounds():
 
 def create_round(category, question, trivia_1, trivia_2, trivia_3):
     """Create a new round with the given details."""
-    conn = get_connection()
+    conn = dbconnect()
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -149,7 +149,7 @@ def create_round(category, question, trivia_1, trivia_2, trivia_3):
 
 def submit_guess(round_id, guess_index):
     """Submit a player's guess for a round."""
-    conn = get_connection()
+    conn = dbconnect()
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -163,7 +163,7 @@ def submit_guess(round_id, guess_index):
 
 def reveal_twist(round_id, twist_index, explanation_1, explanation_2, explanation_3):
     """Reveal the twist for a round with explanations."""
-    conn = get_connection()
+    conn = dbconnect()
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -177,7 +177,7 @@ def reveal_twist(round_id, twist_index, explanation_1, explanation_2, explanatio
 
 def get_last_round():
     """Get the details of the last round."""
-    conn = get_connection()
+    conn = dbconnect()
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -191,7 +191,7 @@ def get_last_round():
 
 def get_round(round_id):
     """Get the details of a specific round."""
-    conn = get_connection()
+    conn = dbconnect()
     cursor = conn.cursor()
     
     cursor.execute('SELECT * FROM rounds WHERE id = ?', (round_id,))
