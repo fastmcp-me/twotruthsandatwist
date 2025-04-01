@@ -1,0 +1,17 @@
+[project]
+name = "ttaat"
+version = "0.1.0"
+description = "Two Truths and a Twist: A trivia game for users of AI"
+readme = "README.md"
+authors = [
+    { name = "moorkh", email = "moorkh@ergodic.xyz" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+ttaat = "ttaat:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
