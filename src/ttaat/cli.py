@@ -93,16 +93,9 @@ def generate_argument_parser():
     serve_parser = subparsers.add_parser('serve', help='Start the MCP server')
     serve_parser.set_defaults(func=handle_serve)
     
-    # Custom default function that respects the stdout/stderr handling
-    def show_help(args):
-        import sys
-        # If we're running the serve command, print to stderr
-        if len(sys.argv) > 1 and sys.argv[1] == 'serve':
-            parser.print_help(file=sys.stderr)
-        else:
-            parser.print_help()
-    
-    parser.set_defaults(func=show_help)
+    # Always print help to stderr for simplicity
+    import sys
+    parser.set_defaults(func=lambda _: parser.print_help(file=sys.stderr))
     
     return parser
 
@@ -110,19 +103,16 @@ def generate_argument_parser():
 def main() -> None:
     import sys
     
-    # Create parser with custom file parameter for the serve command
+    # Create the parser and make it print all messages to stderr
     parser = generate_argument_parser()
+    parser._print_message = lambda message, file=None: print(message, file=sys.stderr)
     
-    # Redirect parser output to stderr for the 'serve' command
+    # If running the serve command, print startup message
     if len(sys.argv) > 1 and sys.argv[1] == 'serve':
-        # Make sure no help output goes to stdout
-        parser._print_message = lambda message, file=None: print(message, file=sys.stderr)
         print("Starting Two Truths and a Twist MCP server...", file=sys.stderr)
     
-    # Parse arguments
+    # Parse arguments and run command
     args = parser.parse_args()
-    
-    # Execute the command
     args.func(args)
 
 
