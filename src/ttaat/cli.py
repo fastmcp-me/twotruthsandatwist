@@ -93,35 +93,34 @@ def generate_argument_parser():
     serve_parser = subparsers.add_parser('serve', help='Start the MCP server')
     serve_parser.set_defaults(func=handle_serve)
     
-    parser.set_defaults(func=lambda _: parser.print_help())
+    # Custom default function that respects the stdout/stderr handling
+    def show_help(args):
+        import sys
+        # If we're running the serve command, print to stderr
+        if len(sys.argv) > 1 and sys.argv[1] == 'serve':
+            parser.print_help(file=sys.stderr)
+        else:
+            parser.print_help()
+    
+    parser.set_defaults(func=show_help)
     
     return parser
 
 
 def main() -> None:
     import sys
-    import io
     
-    # For the 'serve' command, we need to silence argparse's stdout output
-    # to prevent it from interfering with the MCP protocol
+    # Create parser with custom file parameter for the serve command
+    parser = generate_argument_parser()
+    
+    # Redirect parser output to stderr for the 'serve' command
     if len(sys.argv) > 1 and sys.argv[1] == 'serve':
-        # Temporarily redirect stdout to a string buffer during argument parsing
-        original_stdout = sys.stdout
-        sys.stdout = io.StringIO()
-        
-        try:
-            parser = generate_argument_parser()
-            args = parser.parse_args()
-        finally:
-            # Restore stdout immediately after parsing
-            sys.stdout = original_stdout
-        
-        # Log to stderr
+        # Make sure no help output goes to stdout
+        parser._print_message = lambda message, file=None: print(message, file=sys.stderr)
         print("Starting Two Truths and a Twist MCP server...", file=sys.stderr)
-    else:
-        # For all other commands, parse normally
-        parser = generate_argument_parser()
-        args = parser.parse_args()
+    
+    # Parse arguments
+    args = parser.parse_args()
     
     # Execute the command
     args.func(args)
