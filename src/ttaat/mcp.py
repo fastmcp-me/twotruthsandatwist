@@ -3,7 +3,6 @@ import asyncio
 import logging
 import sys
 import os
-import argparse
 from contextlib import closing
 from typing import Any, Dict, List, Optional
 
@@ -281,16 +280,12 @@ class TtaatGameServer:
             )
 
 
-def main():
-    """Main entry point for the TTAAT MCP server."""
-    parser = argparse.ArgumentParser(description='Two Truths and a Twist MCP Server')
-    
-    args = parser.parse_args()
-    
+def serve_mcp():
+    """Start the TTAAT MCP server."""
     # Initialize and start the server
     game_server = TtaatGameServer()
     asyncio.run(game_server.start_server())
 
 
 if __name__ == "__main__":
-    main()
+    serve_mcp()

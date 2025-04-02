@@ -60,13 +60,13 @@ def handle_db_stats(args):
         print("Make sure the database is initialized with 'ttaat db upgrade'")
 
 
-def handle_mcp_server(args):
+def handle_serve(args):
     """Start the MCP server."""
     print("Starting Two Truths and a Twist MCP server...")
     
     # Import here to avoid circular imports
-    from .mcp import main as mcp_main
-    mcp_main()
+    from .mcp import serve_mcp
+    serve_mcp()
 
 
 def generate_argument_parser():
@@ -88,9 +88,9 @@ def generate_argument_parser():
     stats_parser = db_subparsers.add_parser('stats', help='Show database statistics')
     stats_parser.set_defaults(func=handle_db_stats)
     
-    # mcp server command
-    mcp_parser = subparsers.add_parser('mcp', help='Start the MCP server')
-    mcp_parser.set_defaults(func=handle_mcp_server)
+    # serve command
+    serve_parser = subparsers.add_parser('serve', help='Start the MCP server')
+    serve_parser.set_defaults(func=handle_serve)
     
     parser.set_defaults(func=lambda _: parser.print_help())
     
