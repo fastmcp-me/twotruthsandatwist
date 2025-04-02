@@ -22,29 +22,6 @@ def dbconnect():
     return conn
 
 
-def initialize_db():
-    """Initialize the database with the schema if it doesn't exist yet."""
-    conn = dbconnect()
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='ttaat_db_version'")
-    if not cursor.fetchone():
-        cursor.execute("CREATE TABLE ttaat_db_version (version INTEGER NOT NULL)")
-        cursor.execute("INSERT INTO ttaat_db_version (version) VALUES (?)", (TTAAT_DB_VERSION,))
-        
-        create_schema_v0(cursor)
-        
-        conn.commit()
-    else:
-        cursor.execute("SELECT version FROM ttaat_db_version")
-        db_version = cursor.fetchone()[0]
-        
-        if db_version < TTAAT_DB_VERSION:
-            migrate_db(conn, db_version)
-    
-    conn.close()
-
-
 def create_schema_v0(cursor):
     """Create the initial database schema (version 0)."""
     cursor.execute('''
@@ -83,16 +60,69 @@ def create_schema_v0(cursor):
     ''')
 
 
-def migrate_db(conn, current_version):
-    """Migrate the database to the current version."""
+def upgrade_db():
+    """Initialize or upgrade the database to the latest version.
+    
+    This function will:
+    1. Create the database if it doesn't exist
+    2. Initialize the schema if it's empty
+    3. Apply migrations if the schema exists but is outdated
+    
+    Returns:
+        tuple: (was_upgraded, old_version, new_version)
+    """
+    conn = dbconnect()
     cursor = conn.cursor()
     
-    # if current_version < 1:
-    #     migrate_to_v1(cursor)
-    #     current_version = 1
+    # Check if the version table exists
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='ttaat_db_version'")
+    if not cursor.fetchone():
+        # This is a new or empty database
+        cursor.execute("CREATE TABLE ttaat_db_version (version INTEGER NOT NULL)")
+        cursor.execute("INSERT INTO ttaat_db_version (version) VALUES (?)", (TTAAT_DB_VERSION,))
+        
+        # Create the initial schema
+        create_schema_v0(cursor)
+        
+        conn.commit()
+        conn.close()
+        return True, None, TTAAT_DB_VERSION
     
-    cursor.execute("UPDATE ttaat_db_version SET version = ?", (TTAAT_DB_VERSION,))
-    conn.commit()
+    # Database exists, check its version
+    cursor.execute("SELECT version FROM ttaat_db_version")
+    current_version = cursor.fetchone()[0]
+    
+    if current_version < TTAAT_DB_VERSION:
+        # Apply migrations sequentially
+        if current_version < 1 and TTAAT_DB_VERSION >= 1:
+            # Uncomment and implement when there's an actual migration to version 1
+            # print("Applying migration to version 1...")
+            # migrate_to_v1(cursor)
+            current_version = 1
+        
+        # Add more version upgrades here as the database schema evolves
+        # if current_version < 2 and TTAAT_DB_VERSION >= 2:
+        #     print("Applying migration to version 2...")
+        #     migrate_to_v2(cursor)
+        #     current_version = 2
+        
+        # Update the database version
+        cursor.execute("UPDATE ttaat_db_version SET version = ?", (TTAAT_DB_VERSION,))
+        conn.commit()
+        
+        old_version = current_version
+        conn.close()
+        return True, old_version, TTAAT_DB_VERSION
+    else:
+        # Database is already at the latest version
+        conn.close()
+        return False, current_version, TTAAT_DB_VERSION
+
+
+# For backwards compatibility
+def initialize_db():
+    """Initialize the database with the schema if it doesn't exist yet."""
+    return upgrade_db()[0]
 
 
 def get_score():
@@ -128,6 +158,32 @@ def get_total_rounds():
     
     conn.close()
     return total_rounds
+
+
+def get_twist_index_stats():
+    """Get the statistics of how many times each index was chosen as the twist."""
+    conn = dbconnect()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+    SELECT twist_index, COUNT(*) as count
+    FROM twists
+    GROUP BY twist_index
+    ORDER BY twist_index
+    ''')
+    
+    results = cursor.fetchall()
+    
+    # Create a dictionary with counts for each index (0, 1, 2)
+    stats = {0: 0, 1: 0, 2: 0}
+    
+    for row in results:
+        index = row[0]
+        count = row[1]
+        stats[index] = count
+    
+    conn.close()
+    return stats
 
 
 def create_round(category, question, trivia_1, trivia_2, trivia_3):
