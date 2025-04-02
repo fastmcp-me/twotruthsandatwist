@@ -2,6 +2,8 @@
 
 Two Truths and a Twist: The world's first Model Context Protocol (MCP) game
 
+[Game design document](https://docs.google.com/document/d/1kW88UU5bjszQJgyB_JNkpvbnfaSNcKIP4mRR3R-HL1o/edit?usp=sharing)
+
 ## Installation
 
 ### Requirements
@@ -65,13 +67,6 @@ For Claude Desktop, place this file in:
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 - Linux: `~/.config/Claude/claude_desktop_config.json`
 
-For Claude CLI users, you can use:
-
-```bash
-# For Claude CLI
-claude chat --mcp-server ttaat:serve
-```
-
 ## Game Mechanics
 
 Two Truths and a Twist is a trivia game where:
@@ -103,5 +98,3 @@ This package implements an MCP server that provides custom game tools:
 - `get_round`: Retrieves details for a specific round
 - `get_last_round`: Gets details of the most recent round
 - `get_stats`: Retrieves game statistics
-
-[Detailed game design document](https://docs.google.com/document/d/1kW88UU5bjszQJgyB_JNkpvbnfaSNcKIP4mRR3R-HL1o/edit?usp=sharing)
