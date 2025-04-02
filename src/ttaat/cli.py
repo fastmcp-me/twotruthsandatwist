@@ -62,7 +62,10 @@ def handle_db_stats(args):
 
 def handle_serve(args):
     """Start the MCP server."""
-    print("Starting Two Truths and a Twist MCP server...")
+    # Don't print anything to stdout as it will interfere with the MCP protocol
+    # Instead, use stderr for logging
+    import sys
+    print("Starting Two Truths and a Twist MCP server...", file=sys.stderr)
     
     # Import here to avoid circular imports
     from .mcp import serve_mcp
