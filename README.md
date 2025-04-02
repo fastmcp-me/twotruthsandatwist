@@ -36,13 +36,43 @@ To start the MCP server:
 ttaat serve
 ```
 
-This will start the Two Truths and a Twist MCP server on port 8000, which LLMs can connect to for playing the game.
+This will start the Two Truths and a Twist MCP server, which LLMs can connect to for playing the game.
 
 ### View Game Statistics
 To see game statistics:
 
 ```bash
 ttaat db stats
+```
+
+## Connecting to the Server
+
+To connect an MCP-compatible LLM to the game server, you'll need to configure the MCP connection. Create a configuration file (e.g., `ttaat-config.json`) with the following content:
+
+```json
+{
+  "mcp": {
+    "enabled": true,
+    "tools": [
+      {
+        "name": "ttaat-dev",
+        "type": "exec",
+        "provider": "ttaat serve",
+        "prefix": "ttaat"
+      }
+    ]
+  }
+}
+```
+
+Then, when starting your LLM client, point it to this configuration:
+
+```bash
+# For Claude Code
+claude code --config path/to/ttaat-config.json
+
+# For Claude CLI
+claude chat --config path/to/ttaat-config.json
 ```
 
 ## Game Mechanics
@@ -54,6 +84,18 @@ Two Truths and a Twist is a trivia game where:
 3. The AI reveals the answer with entertaining explanations
 
 The game leverages the MCP protocol to provide a fun, interactive trivia experience where AI models both generate the content and facilitate gameplay.
+
+## Example Prompts
+
+Once connected to an MCP-enabled LLM, you can start a game with prompts like:
+
+```
+Let's play Two Truths and a Twist! Create a round about space exploration.
+```
+
+```
+Create a game round about ancient civilizations.
+```
 
 ## For Developers
 
