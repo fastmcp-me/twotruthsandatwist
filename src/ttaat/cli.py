@@ -101,9 +101,19 @@ def generate_argument_parser():
 
 
 def main() -> None:
-    parser = generate_argument_parser()
-    args = parser.parse_args()
-    args.func(args)
+    import sys
+    
+    # Special handling for 'serve' command to prevent stdout pollution
+    if len(sys.argv) > 1 and sys.argv[1] == 'serve':
+        # Import and call serve_mcp directly, bypassing argparse
+        from .mcp import serve_mcp
+        print("Starting Two Truths and a Twist MCP server...", file=sys.stderr)
+        serve_mcp()
+    else:
+        # Normal CLI operation
+        parser = generate_argument_parser()
+        args = parser.parse_args()
+        args.func(args)
 
 
 if __name__ == "__main__":
