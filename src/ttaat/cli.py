@@ -99,19 +99,29 @@ def generate_argument_parser():
 
 
 def main() -> None:
-    # Redirect stdout to stderr for the entire process when using MCP
-    # This ensures argparse help messages don't interfere with the protocol
     import sys
+    import io
     
-    # Parse arguments normally
-    parser = generate_argument_parser()
-    args = parser.parse_args()
-    
-    # Only redirect stdout for the serve command
-    if hasattr(args, 'command') and args.command == 'serve':
-        # This redirects stdout to stderr, ensuring clean stdout for MCP
-        sys.stdout = sys.stderr
+    # For the 'serve' command, we need to silence argparse's stdout output
+    # to prevent it from interfering with the MCP protocol
+    if len(sys.argv) > 1 and sys.argv[1] == 'serve':
+        # Temporarily redirect stdout to a string buffer during argument parsing
+        original_stdout = sys.stdout
+        sys.stdout = io.StringIO()
+        
+        try:
+            parser = generate_argument_parser()
+            args = parser.parse_args()
+        finally:
+            # Restore stdout immediately after parsing
+            sys.stdout = original_stdout
+        
+        # Log to stderr
         print("Starting Two Truths and a Twist MCP server...", file=sys.stderr)
+    else:
+        # For all other commands, parse normally
+        parser = generate_argument_parser()
+        args = parser.parse_args()
     
     # Execute the command
     args.func(args)
