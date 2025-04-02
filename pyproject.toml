@@ -1,6 +1,6 @@
 [project]
 name = "ttaat"
-version = "0.1.0"
+version = "0.1.1"
 description = "Two Truths and a Twist: A trivia game for users of AI"
 readme = "README.md"
 authors = [
