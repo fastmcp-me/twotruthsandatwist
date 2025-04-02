@@ -6,11 +6,14 @@ readme = "README.md"
 authors = [
     { name = "moorkh", email = "moorkh@ergodic.xyz" }
 ]
-requires-python = ">=3.14"
-dependencies = []
+requires-python = ">=3.13"
+dependencies = [
+    "mcp[cli]>=1.6.0",
+    "platformdirs>=4.0.0",
+]
 
 [project.scripts]
-ttaat = "ttaat:main"
+ttaat = "ttaat.cli:main"
 
 [build-system]
 requires = ["hatchling"]
