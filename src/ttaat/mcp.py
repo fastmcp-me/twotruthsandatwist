@@ -65,15 +65,15 @@ class TtaatGameServer:
         return [
             types.Tool(
                 name="create_round",
-                description="Create a new game round with a question and three statements",
+                description="Create a new game round with a question and three statements. The twist should be playful, surprising, and entertaining - not just factually incorrect.",
                 inputSchema={
                     "type": "object",
                     "properties": {
                         "category": {"type": "string", "description": "The category of the question"},
                         "question": {"type": "string", "description": "The main question for the round"},
-                        "trivia_1": {"type": "string", "description": "First statement"},
-                        "trivia_2": {"type": "string", "description": "Second statement"},
-                        "trivia_3": {"type": "string", "description": "Third statement"},
+                        "trivia_1": {"type": "string", "description": "First statement - can be truth or twist"},
+                        "trivia_2": {"type": "string", "description": "Second statement - can be truth or twist"},
+                        "trivia_3": {"type": "string", "description": "Third statement - can be truth or twist"},
                     },
                     "required": ["category", "question", "trivia_1", "trivia_2", "trivia_3"],
                 },
@@ -92,15 +92,15 @@ class TtaatGameServer:
             ),
             types.Tool(
                 name="reveal_twist",
-                description="Reveal which statement was the twist and provide explanations",
+                description="Reveal which statement was the twist and provide explanations. The explanations should be entertaining and playful - build anticipation and make the reveal fun!",
                 inputSchema={
                     "type": "object",
                     "properties": {
                         "round_id": {"type": "integer", "description": "The ID of the round"},
                         "twist_index": {"type": "integer", "description": "Index of the twist statement (0, 1, or 2)"},
-                        "explanation_1": {"type": "string", "description": "Explanation for statement 1"},
-                        "explanation_2": {"type": "string", "description": "Explanation for statement 2"},
-                        "explanation_3": {"type": "string", "description": "Explanation for statement 3"},
+                        "explanation_1": {"type": "string", "description": "Explanation for statement 1 - be creative and entertaining"},
+                        "explanation_2": {"type": "string", "description": "Explanation for statement 2 - be creative and entertaining"},
+                        "explanation_3": {"type": "string", "description": "Explanation for statement 3 - be creative and entertaining"},
                     },
                     "required": ["round_id", "twist_index", "explanation_1", "explanation_2", "explanation_3"],
                 },
