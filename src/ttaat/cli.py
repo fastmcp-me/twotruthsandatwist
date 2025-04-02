@@ -62,13 +62,11 @@ def handle_db_stats(args):
 
 def handle_serve(args):
     """Start the MCP server."""
-    # Don't print anything to stdout as it will interfere with the MCP protocol
-    # Instead, use stderr for logging
-    import sys
-    print("Starting Two Truths and a Twist MCP server...", file=sys.stderr)
-    
     # Import here to avoid circular imports
     from .mcp import serve_mcp
+    
+    # stdout should already be redirected to stderr in main()
+    # so we don't need additional redirection here
     serve_mcp()
 
 
@@ -101,19 +99,22 @@ def generate_argument_parser():
 
 
 def main() -> None:
+    # Redirect stdout to stderr for the entire process when using MCP
+    # This ensures argparse help messages don't interfere with the protocol
     import sys
     
-    # Special handling for 'serve' command to prevent stdout pollution
-    if len(sys.argv) > 1 and sys.argv[1] == 'serve':
-        # Import and call serve_mcp directly, bypassing argparse
-        from .mcp import serve_mcp
+    # Parse arguments normally
+    parser = generate_argument_parser()
+    args = parser.parse_args()
+    
+    # Only redirect stdout for the serve command
+    if hasattr(args, 'command') and args.command == 'serve':
+        # This redirects stdout to stderr, ensuring clean stdout for MCP
+        sys.stdout = sys.stderr
         print("Starting Two Truths and a Twist MCP server...", file=sys.stderr)
-        serve_mcp()
-    else:
-        # Normal CLI operation
-        parser = generate_argument_parser()
-        args = parser.parse_args()
-        args.func(args)
+    
+    # Execute the command
+    args.func(args)
 
 
 if __name__ == "__main__":
