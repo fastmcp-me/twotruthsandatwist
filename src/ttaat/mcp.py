@@ -50,9 +50,14 @@ class TtaatGameServer:
         
         self.server = Server("ttaat-game")
         
-        # Register handlers
-        self.server.list_tools()(self.handle_list_tools)
-        self.server.call_tool()(self.handle_call_tool)
+        # Register handlers using decorators
+        @self.server.list_tools()
+        async def handle_list_tools_request():
+            return await self.handle_list_tools()
+            
+        @self.server.call_tool()
+        async def handle_call_tool_request(name: str, arguments: Dict[str, Any] | None):
+            return await self.handle_call_tool(name, arguments)
 
     async def handle_list_tools(self) -> List[types.Tool]:
         """List available tools for the TTAAT game."""
@@ -135,18 +140,18 @@ class TtaatGameServer:
         """Handle tool execution requests."""
         logger.debug(f"Handling call_tool request for {name} with args {arguments}")
         try:
-            if name == "create_round":
-                return await self._handle_create_round(arguments)
-            elif name == "submit_guess":
-                return await self._handle_submit_guess(arguments)
-            elif name == "reveal_twist":
-                return await self._handle_reveal_twist(arguments)
-            elif name == "get_round":
-                return await self._handle_get_round(arguments)
-            elif name == "get_last_round":
-                return await self._handle_get_last_round(arguments)
-            elif name == "get_stats":
-                return await self._handle_get_stats(arguments)
+            # Dispatch to the appropriate handler method based on the tool name
+            handler_map = {
+                "create_round": self._handle_create_round,
+                "submit_guess": self._handle_submit_guess,
+                "reveal_twist": self._handle_reveal_twist,
+                "get_round": self._handle_get_round,
+                "get_last_round": self._handle_get_last_round,
+                "get_stats": self._handle_get_stats,
+            }
+            
+            if name in handler_map:
+                return await handler_map[name](arguments)
             else:
                 raise ValueError(f"Unknown tool: {name}")
                 
