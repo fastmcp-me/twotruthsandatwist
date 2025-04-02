@@ -47,32 +47,29 @@ ttaat db stats
 
 ## Connecting to the Server
 
-To connect an MCP-compatible LLM to the game server, you'll need to configure the MCP connection. Create a configuration file (e.g., `ttaat-config.json`) with the following content:
+To connect an MCP-compatible LLM to the game server, you'll need to configure the MCP connection. Create a configuration file (e.g., `claude_desktop_config.json`) with the following content:
 
 ```json
 {
-  "mcp": {
-    "enabled": true,
-    "tools": [
-      {
-        "name": "ttaat-dev",
-        "type": "exec",
-        "provider": "ttaat serve",
-        "prefix": "ttaat"
-      }
-    ]
+  "mcpServers": {
+    "TwoTruthsAndATwist": {
+      "command": "ttaat",
+      "args": ["serve"]
+    }
   }
 }
 ```
 
-Then, when starting your LLM client, point it to this configuration:
+For Claude Desktop, place this file in:
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+- Linux: `~/.config/Claude/claude_desktop_config.json`
+
+For Claude CLI users, you can use:
 
 ```bash
-# For Claude Code
-claude code --config path/to/ttaat-config.json
-
 # For Claude CLI
-claude chat --config path/to/ttaat-config.json
+claude chat --mcp-server ttaat:serve
 ```
 
 ## Game Mechanics
